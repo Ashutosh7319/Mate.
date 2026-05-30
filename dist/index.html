@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Mate. - Premium minimalistic Chess App with AI opponents, ELO progression, animated board rotation, and game reviews.">
+    <title>Mate. - Minimalistic Chess</title>
+    <!-- PWA Settings -->
+    <link rel="manifest" href="/assets/manifest-DyuqoJ32.json">
+    <meta name="theme-color" content="#0a0a0c">
+    <link rel="icon" type="image/png" href="/assets/Mate-C1gM5MgY.png">
+    <link rel="apple-touch-icon" href="/assets/Mate-C1gM5MgY.png">
+    
+    <!-- Premium Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script type="module" crossorigin src="/assets/index-CWU7GzB-.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DM8nqIp0.css">
+</head>
+<body>
+
+    <!-- APP HEADER -->
+    <header class="app-header">
+        <div class="logo" onclick="navigateTo('home-view')">
+            <img src="/assets/Mate-C1gM5MgY.png" alt="Mate Logo" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color);">
+            <span>Mate.</span>
+        </div>
+        <button class="theme-toggle" id="themeToggleBtn" onclick="toggleDarkMode()">
+            <i class="fa-solid fa-moon" id="themeIcon"></i>
+        </button>
+    </header>
+
+    <!-- MAIN APP CONTAINER -->
+    <main id="app">
+
+        <!-- MODAL: ONBOARDING -->
+        <div id="onboardingModal" class="modal-overlay hidden">
+            <div class="modal">
+                <h2>Welcome to Mate.</h2>
+                <p>Create a profile to begin your checkmate journey.</p>
+                <input type="text" id="nameInput" placeholder="Enter your name" maxlength="15">
+                <div style="text-align: left; width: 100%;">
+                    <p style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Profile Picture (Optional)</p>
+                    <input type="file" id="imageInput" accept="image/*">
+                </div>
+                <button class="btn-primary" onclick="submitOnboardingProfile()">Start Playing</button>
+            </div>
+        </div>
+
+        <!-- MODAL: PROFILE EDIT -->
+        <div id="profileEditModal" class="modal-overlay hidden">
+            <div class="modal">
+                <h2>Edit Profile</h2>
+                <p>Update your details below.</p>
+                <input type="text" id="editNameInput" placeholder="Enter your name" maxlength="15">
+                <div style="text-align: left; width: 100%;">
+                    <p style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Change Picture</p>
+                    <input type="file" id="editImageInput" accept="image/*">
+                </div>
+                <button class="btn-primary" onclick="submitProfileEdit()">Save Changes</button>
+                <button class="mode-btn" onclick="closeProfileEdit()">Cancel</button>
+            </div>
+        </div>
+
+        <!-- VIEW 1: HOME VIEW -->
+        <div id="home-view" class="view">
+            <div class="home-wrapper">
+                <!-- User profile greeting card -->
+                <div class="player-card glass" onclick="openProfileEdit()">
+                    <div class="avatar" id="avatar">
+                        <div class="avatar-placeholder"><i class="fa-solid fa-user"></i></div>
+                    </div>
+                    <div class="player-info-text">
+                        <h2 id="username">Loading...</h2>
+                        <p id="greeting">Ready to checkmate some players!</p>
+                    </div>
+                </div>
+
+                <p class="section-label">Your Ratings</p>
+                <!-- ELO cards grid -->
+                <div class="rating-grid">
+                    <div class="rating-card glass">
+                        <div class="rating-title">
+                            <i class="fa-solid fa-clock" style="color: var(--accent-blue);"></i> Rapid (10m)
+                        </div>
+                        <span class="rating-value" id="rapidElo">200</span>
+                    </div>
+                    <div class="rating-card glass">
+                        <div class="rating-title">
+                            <i class="fa-solid fa-bolt" style="color: var(--accent-red);"></i> Blitz (3m)
+                        </div>
+                        <span class="rating-value" id="blitzElo">200</span>
+                    </div>
+                    <div class="rating-card glass">
+                        <div class="rating-title">
+                            <i class="fa-solid fa-bullseye" style="color: var(--accent-green);"></i> Bullet (1m)
+                        </div>
+                        <span class="rating-value" id="bulletElo">200</span>
+                    </div>
+                </div>
+
+                <p class="section-label">Menu Options</p>
+                <!-- Navigation menu cards grid -->
+                <div class="menu-grid">
+                    <div class="menu-card glass" onclick="promptGameMode('local')">
+                        <h3><i class="fa-solid fa-user-group"></i> Play Local</h3>
+                        <p>Play a match with a friend on this device. Board rotates dynamically with each move.</p>
+                    </div>
+                    <div class="menu-card glass" onclick="navigateTo('bots-view')">
+                        <h3><i class="fa-solid fa-robot"></i> Play Bot</h3>
+                        <p>Challenge engine opponents ranging from 900 to 2880 ELO. Beat them 5 times to claim rewards.</p>
+                    </div>
+                    <div class="menu-card glass" onclick="navigateTo('settings-view')">
+                        <h3><i class="fa-solid fa-palette"></i> Board Themes</h3>
+                        <p>Customize the look and feel of the chess board. Page remains clean and B&W.</p>
+                    </div>
+                    <div class="menu-card glass" onclick="navigateTo('analysis-view')">
+                        <h3><i class="fa-solid fa-chart-line"></i> Game Analysis</h3>
+                        <p>Review the moves from your last 5 matches and analyze accuracy using Stockfish.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: BOTS LIST VIEW -->
+        <div id="bots-view" class="view hidden">
+            <div class="bots-wrapper">
+                <button class="mode-btn" onclick="navigateTo('home-view')" style="max-width: 140px; align-self: flex-start; margin-bottom: 8px;"><i class="fa-solid fa-arrow-left"></i> Back Home</button>
+                <h2 class="page-title">Challenge AI Opponents</h2>
+                <div class="bot-grid" id="botGrid">
+                    <!-- Bot cards dynamically populated by bot-ai.js -->
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: ACTIVE GAME VIEW -->
+        <div id="game-view" class="view hidden">
+            <div class="game-wrapper">
+                <!-- Left eval bar -->
+                <div class="eval-bar-wrapper">
+                    <div class="eval-bar">
+                        <div class="eval-fill" id="evalFill"></div>
+                    </div>
+                    <span class="eval-score" id="evalScore">0.0</span>
+                </div>
+
+                <!-- Central board area -->
+                <div class="board-area">
+                    <div id="botHeader" class="bot-header hidden">
+                        <img id="botAvatar" src="" alt="Bot">
+                        <div class="bot-header-info">
+                            <h4 id="botName">Bot Name</h4>
+                            <span id="botElo">900 ELO</span>
+                        </div>
+                        <div class="bot-speech" id="botSpeech">Let's play!</div>
+                    </div>
+
+                    <div class="player-bar">
+                        <div class="player-info">
+                            <span class="name" id="topPlayerName">Black</span>
+                        </div>
+                        <div class="captures" id="topCaptures"></div>
+                        <span class="timer" id="topTimer">10:00</span>
+                    </div>
+
+                    <div class="board-wrapper">
+                        <div id="checkAlert" class="check-alert hidden">CHECK</div>
+                        <div id="animationLayer"></div>
+                        <div id="chessBoard" class="theme-classic"></div>
+                    </div>
+
+                    <div class="player-bar">
+                        <div class="player-info">
+                            <span class="name" id="bottomPlayerName">White</span>
+                        </div>
+                        <div class="captures" id="bottomCaptures"></div>
+                        <span class="timer" id="bottomTimer">10:00</span>
+                    </div>
+                </div>
+
+                <!-- Right sidebar move history -->
+                <div class="game-sidebar">
+                    <div class="move-history">
+                        <h3>Game Notation</h3>
+                        <div id="moveList"></div>
+                    </div>
+                    <button class="mode-btn" onclick="exitGameSession()"><i class="fa-solid fa-arrow-left"></i> Exit Match</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 4: BOARD THEMES SETTINGS -->
+        <div id="settings-view" class="view hidden">
+            <div class="settings-wrapper">
+                <button class="mode-btn" onclick="navigateTo('home-view')" style="max-width: 140px; align-self: flex-start; margin-bottom: 8px;"><i class="fa-solid fa-arrow-left"></i> Back Home</button>
+                <h2 class="page-title">Select Board Theme</h2>
+                <div class="theme-grid" id="themeGrid">
+                    <!-- Themes dynamically added in theme.js -->
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 5: GAME ANALYSIS LIST -->
+        <div id="analysis-view" class="view hidden">
+            <div class="analysis-wrapper">
+                <button class="mode-btn" onclick="navigateTo('home-view')" style="max-width: 140px; align-self: flex-start; margin-bottom: 8px;"><i class="fa-solid fa-arrow-left"></i> Back Home</button>
+                <h2 class="page-title">Your Recent Games</h2>
+                <div class="game-list" id="analysisList">
+                    <!-- Dynamic game history list -->
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 6: ANALYSIS REPLAY VIEW -->
+        <div id="replay-view" class="view hidden">
+            <div class="replay-wrapper">
+                <!-- Left eval bar -->
+                <div class="eval-bar-wrapper">
+                    <div class="eval-bar">
+                        <div class="eval-fill" id="replayEvalFill"></div>
+                    </div>
+                    <span class="eval-score" id="replayEvalScore">0.0</span>
+                </div>
+
+                <!-- Central replay area -->
+                <div class="board-area">
+                    <div class="player-bar">
+                        <div class="player-info">
+                            <span class="name" id="replayTopName">Opponent</span>
+                        </div>
+                    </div>
+
+                    <div class="board-wrapper">
+                        <div class="analysis-loading hidden" id="analysisLoading">
+                            <div class="loading-text">Stockfish Analyzing Moves...</div>
+                            <div class="loading-bar"><div class="loading-bar-fill" id="loadingBarFill"></div></div>
+                        </div>
+                        <div id="replayAnimationLayer"></div>
+                        <div id="replayBoard" class="theme-classic"></div>
+                    </div>
+
+                    <div class="player-bar">
+                        <div class="player-info">
+                            <span class="name" id="replayBottomName">You</span>
+                        </div>
+                    </div>
+
+                    <div class="replay-controls">
+                        <button class="replay-btn" id="prevMoveBtn" onclick="replayPrevMove()"><i class="fa-solid fa-arrow-left"></i></button>
+                        <span class="move-counter" id="moveCounter">0 / 0</span>
+                        <button class="replay-btn" id="nextMoveBtn" onclick="replayNextMove()"><i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- Right sidebar notation history -->
+                <div class="replay-sidebar">
+                    <div class="move-history">
+                        <h3>Replay Notation</h3>
+                        <div id="replayMoveList"></div>
+                    </div>
+                    <button class="mode-btn" onclick="exitReplaySession()"><i class="fa-solid fa-arrow-left"></i> Exit Review</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: TIME CONTROL SELECTION -->
+        <div id="modeModal" class="modal-overlay hidden">
+            <div class="modal">
+                <h2>Select Time Control</h2>
+                <p>Set the clock speed for this match.</p>
+                <div class="modal-options-list">
+                    <button class="mode-btn" onclick="initializeGameSession('rapid')">
+                        <i class="fa-solid fa-clock" style="color: var(--accent-blue);"></i> Rapid • 10 Min
+                    </button>
+                    <button class="mode-btn" onclick="initializeGameSession('bullet')">
+                        <i class="fa-solid fa-bullseye" style="color: var(--accent-green);"></i> Bullet • 1 Min
+                    </button>
+                    <button class="mode-btn" onclick="initializeGameSession('blitz')">
+                        <i class="fa-solid fa-bolt" style="color: var(--accent-red);"></i> Blitz • 3 Min
+                    </button>
+                </div>
+                <button class="mode-btn" onclick="closeTimePrompt()" style="margin-top: 8px;">Cancel</button>
+            </div>
+        </div>
+
+        <!-- MODAL: PAWN PROMOTION -->
+        <div id="promotionModal" class="modal-overlay hidden">
+            <div class="modal">
+                <h2>Pawn Promotion</h2>
+                <p>Select which piece to promote your pawn to.</p>
+                <div class="promotion-grid" id="promotionOptions">
+                    <!-- Piece SVGs dynamically loaded on pawn color in game.js -->
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: GAME OVER RESULT -->
+        <div id="gameOverModal" class="modal-overlay hidden">
+            <div class="modal">
+                <h2 id="gameResultTitle">Checkmate</h2>
+                <p id="gameResultSubtitle">White wins the match</p>
+                <div class="gameover-buttons">
+                    <button class="btn-primary" onclick="rematchGameSession()">Rematch</button>
+                    <button class="mode-btn" onclick="exitGameSession()">Exit</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: PWA DOWNLOAD PROMPT -->
+        <div id="installModal" class="modal-overlay hidden">
+            <div class="modal" id="installModalContent">
+                <!-- Standard PWA Prompt -->
+                <div id="pwaPromptStandard">
+                    <img src="/assets/Mate-C1gM5MgY.png" alt="Mate Logo" style="width: 80px; height: 80px; border-radius: 22px; margin: 0 auto 16px auto; object-fit: cover; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); display: block;">
+                    <h2>Download Mate.</h2>
+                    <p style="margin-bottom: 20px; font-size: 14px; line-height: 1.5;">Install Mate. on your device for full-screen offline gameplay and a premium native app experience!</p>
+                    <button class="btn-primary" style="width: 100%; margin-bottom: 8px;" onclick="triggerPwaInstall()">Download App</button>
+                    <button class="mode-btn" style="width: 100%;" onclick="closeInstallPrompt()">Not Now</button>
+                </div>
+                
+                <!-- iOS Safari Install Guide -->
+                <div id="pwaPromptIos" class="hidden">
+                    <img src="/assets/Mate-C1gM5MgY.png" alt="Mate Logo" style="width: 60px; height: 60px; border-radius: 16px; margin: 0 auto 12px auto; object-fit: cover; border: 1px solid var(--border-color); display: block;">
+                    <h2 style="font-size: 20px; margin-bottom: 8px;">Install on iOS</h2>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.4;">iOS Safari does not support one-click downloads. Follow these quick steps to add Mate. to your home screen:</p>
+                    <div style="text-align: left; background: var(--bg-card); padding: 14px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 20px; font-size: 13px; color: var(--text-primary);">
+                        <div style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 12px;">
+                            <span style="display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: var(--text-primary); color: var(--bg-main); font-weight: 700; font-size: 11px; flex-shrink: 0; margin-top: 2px;">1</span>
+                            <span>Tap the <strong>Share</strong> button <i class="fa-solid fa-share-from-square" style="color: var(--accent-blue); margin-left: 4px;"></i> in the bottom toolbar.</span>
+                        </div>
+                        <div style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 12px;">
+                            <span style="display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: var(--text-primary); color: var(--bg-main); font-weight: 700; font-size: 11px; flex-shrink: 0; margin-top: 2px;">2</span>
+                            <span>Scroll down and tap <strong>Add to Home Screen</strong> <i class="fa-solid fa-square-plus" style="margin-left: 4px;"></i>.</span>
+                        </div>
+                        <div style="display: flex; align-items: flex-start; gap: 12px;">
+                            <span style="display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: var(--text-primary); color: var(--bg-main); font-weight: 700; font-size: 11px; flex-shrink: 0; margin-top: 2px;">3</span>
+                            <span>Tap <strong>Add</strong> in the top-right corner to complete.</span>
+                        </div>
+                    </div>
+                    <button class="btn-primary" style="width: 100%;" onclick="closeInstallPrompt()">Got It</button>
+                </div>
+
+                <!-- Generic Browser Manual Install Guide -->
+                <div id="pwaPromptManual" class="hidden">
+                    <img src="/assets/Mate-C1gM5MgY.png" alt="Mate Logo" style="width: 60px; height: 60px; border-radius: 16px; margin: 0 auto 12px auto; object-fit: cover; border: 1px solid var(--border-color); display: block;">
+                    <h2 style="font-size: 20px; margin-bottom: 8px;">Install Mate.</h2>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.4;">To install Mate. on your laptop or desktop device:</p>
+                    <div style="text-align: left; background: var(--bg-card); padding: 14px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 20px; font-size: 13px; line-height: 1.6; color: var(--text-primary);">
+                        <p style="margin-bottom: 8px;"><i class="fa-solid fa-download" style="color: var(--accent-green); margin-right: 8px;"></i> Click the <strong>Install Icon</strong> in your browser's address bar (URL bar).</p>
+                        <p><i class="fa-solid fa-ellipsis-vertical" style="margin-right: 8px; width: 14px; text-align: center;"></i> Or open your browser settings and select <strong>"Install Mate."</strong> or <strong>"Save as App"</strong>.</p>
+                    </div>
+                    <button class="btn-primary" style="width: 100%;" onclick="closeInstallPrompt()">Got It</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Celebration confetti overlay -->
+        <div id="celebration" class="celebration hidden"></div>
+
+    </main>
+
+    <!-- CORE JS MODULES -->
+    
+    <!-- Audio Elements -->
+    <audio id="moveSound" src="/assets/move-rhJLfN1U.mp3" preload="auto"></audio>
+    <audio id="captureSound" src="/assets/capture-DEFG1C8w.mp3" preload="auto"></audio>
+    <audio id="checkmateSound" src="/assets/checkmate-CcV68Tec.mp3" preload="auto"></audio>
+
+    <!-- PWA CONTROLLER SCRIPTS -->
+    <script>
+        // 1. Register Service Worker for Offline / Install Support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('PWA Service Worker registered:', reg.scope))
+                    .catch(err => console.log('PWA Service Worker failed:', err));
+            });
+        }
+
+        // 2. Manage the Custom Install Prompt & Show on Start
+        let deferredPrompt = null;
+
+        // Function to detect if running as standalone PWA
+        function checkStandalone() {
+            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        }
+
+        // Show the install prompt if not standalone (every time they open the browser)
+        window.addEventListener('DOMContentLoaded', () => {
+            const isStandalone = checkStandalone();
+            if (!isStandalone) {
+                setTimeout(() => {
+                    const modal = document.getElementById('installModal');
+                    if (modal) {
+                        // Ensure we reset modal view to standard prompt on load
+                        document.getElementById('pwaPromptStandard').classList.remove('hidden');
+                        document.getElementById('pwaPromptIos').classList.add('hidden');
+                        document.getElementById('pwaPromptManual').classList.add('hidden');
+                        
+                        modal.classList.remove('hidden');
+                        document.body.classList.add('blur-active');
+                    }
+                }, 1000); // 1-second delay for smooth premium page load
+            }
+        });
+
+        // Listen for beforeinstallprompt event
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+        });
+
+        // Trigger PWA Install
+        window.triggerPwaInstall = function() {
+            if (deferredPrompt) {
+                // Show the browser native install prompt
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User installed the PWA');
+                        window.closeInstallPrompt();
+                    } else {
+                        console.log('User dismissed the PWA installation');
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                // No native install prompt available (e.g. iOS Safari, or manual desktop)
+                const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                
+                document.getElementById('pwaPromptStandard').classList.add('hidden');
+                if (isIos) {
+                    // Show iOS detailed instructions
+                    document.getElementById('pwaPromptIos').classList.remove('hidden');
+                } else {
+                    // Show generic manual instructions
+                    document.getElementById('pwaPromptManual').classList.remove('hidden');
+                }
+            }
+        };
+
+        // Close Install Modal
+        window.closeInstallPrompt = function() {
+            const modal = document.getElementById('installModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.classList.remove('blur-active');
+            }
+        };
+
+        // Auto-close prompt when app is successfully installed/downloaded
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('Mate. app was successfully downloaded and installed!');
+            window.closeInstallPrompt();
+        });
+    </script>
+</body>
+</html>

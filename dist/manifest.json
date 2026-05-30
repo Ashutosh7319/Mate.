@@ -1,0 +1,24 @@
+{
+  "name": "Mate.",
+  "short_name": "Mate.",
+  "description": "Premium minimalistic Chess App with Stockfish bot matches, animated board rotation, and automated game analysis.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0a0c",
+  "theme_color": "#0a0a0c",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "imgs/Mate.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "imgs/Mate.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
