@@ -2,7 +2,7 @@
 // PWA SERVICE WORKER (CACHING STRATEGY)
 // ==========================================
 
-const CACHE_NAME = "mate-chess-cache-v2";
+const CACHE_NAME = "mate-chess-cache-v4";
 const STATIC_SHELL = [
   "./",
   "./index.html",
