@@ -1,0 +1,25 @@
+{
+  "name": "chess",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ashutosh7319/Chess.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ashutosh7319/Chess/issues"
+  },
+  "homepage": "https://github.com/Ashutosh7319/Chess#readme",
+  "devDependencies": {
+    "vite": "^8.0.14"
+  }
+}
