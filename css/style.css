@@ -259,6 +259,7 @@ h1, h2, h3, h4, h5, h6 {
     cursor: pointer;
     font-size: 32px;
     overflow: hidden;
+    flex-shrink: 0;
     box-shadow: var(--shadow-sm);
     transition: transform var(--transition-speed) var(--transition-ease);
 }
