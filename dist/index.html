@@ -377,6 +377,15 @@
                     .then(reg => console.log('PWA Service Worker registered:', reg.scope))
                     .catch(err => console.log('PWA Service Worker failed:', err));
             });
+            
+            // Automatically reload the page when a new Service Worker takes over
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    window.location.reload();
+                    refreshing = true;
+                }
+            });
         }
 
         // 2. Manage the Custom Install Prompt & Show on Start

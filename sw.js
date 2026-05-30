@@ -1,8 +1,8 @@
 // ==========================================
 // PWA SERVICE WORKER (CACHING STRATEGY)
 // ==========================================
-
-const CACHE_NAME = "mate-chess-cache-v4";
+// PWA Service Worker for Offline Support
+const CACHE_NAME = "chess-cache-v5";
 const STATIC_SHELL = [
   "./",
   "./index.html",
