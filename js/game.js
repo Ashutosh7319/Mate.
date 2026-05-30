@@ -85,6 +85,7 @@ const startPosition = [
     "wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP",
     "wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"
 ];
+window.START_POSITION = startPosition;
 
 let boardState = [...startPosition];
 
