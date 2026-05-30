@@ -1286,17 +1286,109 @@ body.light-mode .modal-overlay {
 }
 
 @media (max-width: 768px) {
+    /* Global spacing and Header */
+    .app-header {
+        padding: 16px 20px;
+    }
+    #app {
+        padding: 0 16px 30px;
+    }
+    
+    /* Home Wrapper */
+    .home-wrapper {
+        gap: 20px;
+    }
+    
+    /* Player Card / Avatar */
+    .player-card {
+        padding: 20px;
+        gap: 16px;
+    }
+    .avatar {
+        width: 64px;
+        height: 64px;
+        font-size: 26px;
+    }
+    .player-info-text h2 {
+        font-size: 22px;
+    }
+    .player-info-text p {
+        font-size: 13px;
+    }
+    
+    /* Rating Grid Horizontal Layout */
     .rating-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+    .rating-card {
+        padding: 16px 8px;
+        gap: 8px;
+    }
+    .rating-title {
+        font-size: 11px;
+        gap: 4px;
+    }
+    .rating-title i {
+        font-size: 13px;
+    }
+    .rating-value {
+        font-size: 20px;
+    }
+    
+    /* Menu Grid */
+    .menu-grid {
         grid-template-columns: 1fr;
         gap: 12px;
     }
-    
-    .menu-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
+    .menu-card {
+        padding: 20px;
+    }
+    .menu-card h3 {
+        font-size: 16px;
+    }
+    .menu-card p {
+        font-size: 13px;
     }
     
+    /* Bot Cards */
+    .bot-grid {
+        gap: 16px;
+    }
+    .bot-card {
+        padding: 20px;
+    }
+    .bot-card-avatar {
+        width: 72px;
+        height: 72px;
+    }
+    
+    /* Analysis View */
+    .analysis-item {
+        padding: 16px;
+        gap: 12px;
+        grid-template-columns: 48px 1fr auto;
+    }
+    .analysis-item-avatar {
+        width: 48px;
+        height: 48px;
+    }
+    
+    /* Modals */
+    .modal {
+        padding: 24px;
+    }
+    
+    /* Themes */
     .theme-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    .theme-card {
+        padding: 16px;
+    }
+    .mini-board {
+        width: 80px;
+        height: 80px;
     }
 }
