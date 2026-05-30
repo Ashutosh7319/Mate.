@@ -16,8 +16,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script type="module" crossorigin src="/assets/index-zCleSemy.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-DM8nqIp0.css">
+  <script type="module" crossorigin src="/assets/index-CO3WZlOK.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-fXJGsELe.css">
 </head>
 <body>
 
@@ -38,29 +38,33 @@
         <!-- MODAL: ONBOARDING -->
         <div id="onboardingModal" class="modal-overlay hidden">
             <div class="modal">
-                <h2>Welcome to Mate.</h2>
-                <p>Create a profile to begin your checkmate journey.</p>
-                <input type="text" id="nameInput" placeholder="Enter your name" maxlength="15">
-                <div style="text-align: left; width: 100%;">
-                    <p style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Profile Picture (Optional)</p>
-                    <input type="file" id="imageInput" accept="image/*">
+                <div class="modal-content glass">
+                    <h2>Welcome to Mate.</h2>
+                    <p>Create a profile to begin your checkmate journey.</p>
+                    <input type="text" id="nameInput" placeholder="Enter your name" maxlength="15">
+                    <div style="text-align: left; width: 100%;">
+                        <p style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Profile Picture (Optional)</p>
+                        <input type="file" id="imageInput" accept="image/*">
+                    </div>
+                    <button class="btn-primary" onclick="submitOnboardingProfile()">Start Playing</button>
                 </div>
-                <button class="btn-primary" onclick="submitOnboardingProfile()">Start Playing</button>
             </div>
         </div>
 
         <!-- MODAL: PROFILE EDIT -->
         <div id="profileEditModal" class="modal-overlay hidden">
             <div class="modal">
-                <h2>Edit Profile</h2>
-                <p>Update your details below.</p>
-                <input type="text" id="editNameInput" placeholder="Enter your name" maxlength="15">
-                <div style="text-align: left; width: 100%;">
-                    <p style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Change Picture</p>
-                    <input type="file" id="editImageInput" accept="image/*">
+                <div class="modal-content glass">
+                    <h2>Edit Profile</h2>
+                    <p>Update your details below.</p>
+                    <input type="text" id="editNameInput" placeholder="Enter your name" maxlength="15">
+                    <div style="text-align: left; width: 100%;">
+                        <p style="font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Change Picture</p>
+                        <input type="file" id="editImageInput" accept="image/*">
+                    </div>
+                    <button class="btn-primary" onclick="submitProfileEdit()">Save Changes</button>
+                    <button class="mode-btn" onclick="closeProfileEdit()">Cancel</button>
                 </div>
-                <button class="btn-primary" onclick="submitProfileEdit()">Save Changes</button>
-                <button class="mode-btn" onclick="closeProfileEdit()">Cancel</button>
             </div>
         </div>
 
@@ -268,30 +272,34 @@
         <!-- MODAL: TIME CONTROL SELECTION -->
         <div id="modeModal" class="modal-overlay hidden">
             <div class="modal">
-                <h2>Select Time Control</h2>
-                <p>Set the clock speed for this match.</p>
-                <div class="modal-options-list">
-                    <button class="mode-btn" onclick="initializeGameSession('rapid')">
-                        <i class="fa-solid fa-clock" style="color: var(--accent-blue);"></i> Rapid • 10 Min
-                    </button>
-                    <button class="mode-btn" onclick="initializeGameSession('bullet')">
-                        <i class="fa-solid fa-bullseye" style="color: var(--accent-green);"></i> Bullet • 1 Min
-                    </button>
-                    <button class="mode-btn" onclick="initializeGameSession('blitz')">
-                        <i class="fa-solid fa-bolt" style="color: var(--accent-red);"></i> Blitz • 3 Min
-                    </button>
+                <div class="modal-content glass">
+                    <h2>Select Time Control</h2>
+                    <p>Set the clock speed for this match.</p>
+                    <div class="modal-options-list">
+                        <button class="mode-btn" onclick="initializeGameSession('rapid')">
+                            <i class="fa-solid fa-clock" style="color: var(--accent-blue);"></i> Rapid • 10 Min
+                        </button>
+                        <button class="mode-btn" onclick="initializeGameSession('bullet')">
+                            <i class="fa-solid fa-bullseye" style="color: var(--accent-green);"></i> Bullet • 1 Min
+                        </button>
+                        <button class="mode-btn" onclick="initializeGameSession('blitz')">
+                            <i class="fa-solid fa-bolt" style="color: var(--accent-red);"></i> Blitz • 3 Min
+                        </button>
+                    </div>
+                    <button class="mode-btn" onclick="closeTimePrompt()" style="margin-top: 8px;">Cancel</button>
                 </div>
-                <button class="mode-btn" onclick="closeTimePrompt()" style="margin-top: 8px;">Cancel</button>
             </div>
         </div>
 
         <!-- MODAL: PAWN PROMOTION -->
         <div id="promotionModal" class="modal-overlay hidden">
             <div class="modal">
-                <h2>Pawn Promotion</h2>
-                <p>Select which piece to promote your pawn to.</p>
-                <div class="promotion-grid" id="promotionOptions">
-                    <!-- Piece SVGs dynamically loaded on pawn color in game.js -->
+                <div class="modal-content glass">
+                    <h2>Pawn Promotion</h2>
+                    <p>Select which piece to promote your pawn to.</p>
+                    <div class="promotion-grid" id="promotionOptions">
+                        <!-- Piece SVGs dynamically loaded on pawn color in game.js -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -299,11 +307,13 @@
         <!-- MODAL: GAME OVER RESULT -->
         <div id="gameOverModal" class="modal-overlay hidden">
             <div class="modal">
-                <h2 id="gameResultTitle">Checkmate</h2>
-                <p id="gameResultSubtitle">White wins the match</p>
-                <div class="gameover-buttons">
-                    <button class="btn-primary" onclick="rematchGameSession()">Rematch</button>
-                    <button class="mode-btn" onclick="exitGameSession()">Exit</button>
+                <div class="modal-content glass">
+                    <h2 id="gameResultTitle">Checkmate</h2>
+                    <p id="gameResultSubtitle">White wins the match</p>
+                    <div class="gameover-buttons">
+                        <button class="btn-primary" onclick="rematchGameSession()">Rematch</button>
+                        <button class="mode-btn" onclick="exitGameSession()">Exit</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -312,7 +322,7 @@
         <div id="installModal" class="modal-overlay hidden">
             <div class="modal" id="installModalContent">
                 <!-- Standard PWA Prompt -->
-                <div id="pwaPromptStandard">
+                <div id="pwaPromptStandard" class="modal-content glass">
                     <img src="/assets/Mate-C1gM5MgY.png" alt="Mate Logo" style="width: 80px; height: 80px; border-radius: 22px; margin: 0 auto 16px auto; object-fit: cover; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); display: block;">
                     <h2>Download Mate.</h2>
                     <p style="margin-bottom: 20px; font-size: 14px; line-height: 1.5;">Install Mate. on your device for full-screen offline gameplay and a premium native app experience!</p>
@@ -321,7 +331,7 @@
                 </div>
                 
                 <!-- iOS Safari Install Guide -->
-                <div id="pwaPromptIos" class="hidden">
+                <div id="pwaPromptIos" class="modal-content glass hidden">
                     <img src="/assets/Mate-C1gM5MgY.png" alt="Mate Logo" style="width: 60px; height: 60px; border-radius: 16px; margin: 0 auto 12px auto; object-fit: cover; border: 1px solid var(--border-color); display: block;">
                     <h2 style="font-size: 20px; margin-bottom: 8px;">Install on iOS</h2>
                     <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.4;">iOS Safari does not support one-click downloads. Follow these quick steps to add Mate. to your home screen:</p>
@@ -343,7 +353,7 @@
                 </div>
 
                 <!-- Generic Browser Manual Install Guide -->
-                <div id="pwaPromptManual" class="hidden">
+                <div id="pwaPromptManual" class="modal-content glass hidden">
                     <img src="/assets/Mate-C1gM5MgY.png" alt="Mate Logo" style="width: 60px; height: 60px; border-radius: 16px; margin: 0 auto 12px auto; object-fit: cover; border: 1px solid var(--border-color); display: block;">
                     <h2 style="font-size: 20px; margin-bottom: 8px;">Install Mate.</h2>
                     <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.4;">To install Mate. on your laptop or desktop device:</p>
@@ -390,7 +400,8 @@
         // Show the install prompt if not standalone (every time they open the browser)
         window.addEventListener('DOMContentLoaded', () => {
             const isStandalone = checkStandalone();
-            if (!isStandalone) {
+            const hasProfile = localStorage.getItem("royalChessProfile") !== null;
+            if (!isStandalone && hasProfile) {
                 setTimeout(() => {
                     const modal = document.getElementById('installModal');
                     if (modal) {

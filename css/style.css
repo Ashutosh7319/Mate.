@@ -333,6 +333,28 @@ svg.lucide {
   transition: 0.25s;
 }
 
+.btn-primary {
+  padding: 16px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  background: var(--accent);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: 0.25s;
+  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.35);
+}
+
+.btn-primary:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.55);
+}
+
 .mode-btn:hover {
   background: rgba(220, 38, 38, 0.25);
   transform: scale(1.05);
