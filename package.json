@@ -1,5 +1,5 @@
 {
-  "name": "mate",
+  "name": "chess",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Ashutosh7319/Mate..git"
+    "url": "git+https://github.com/Ashutosh7319/Chess.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Ashutosh7319/Mate./issues"
+    "url": "https://github.com/Ashutosh7319/Chess/issues"
   },
-  "homepage": "https://github.com/Ashutosh7319/Mate.#readme",
+  "homepage": "https://github.com/Ashutosh7319/Chess#readme",
   "devDependencies": {
     "vite": "^8.0.14"
   }

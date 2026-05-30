@@ -1,188 +1,208 @@
-let stockfish = null;
-// let selectedBot = null;
+// ==========================================
+// STOCKFISH ENGINE CONNECTOR (UCI PROTOCOL)
+// ==========================================
 
-function initStockfish() {
+let stockfishWorker = null;
+let evalWorker = null;
+let bestMoveCallback = null;
+let evalCallback = null;
 
-    if (stockfish) return;
-
-    stockfish = new Worker("js/stockfish.js");
-
-    stockfish.postMessage("uci");
-
-    stockfish.onmessage = function (event) {
-
-        const line = event.data;
-
-        // ======================
-        // BOT MOVE
-        // ======================
-        if (line.startsWith("bestmove")) {
-
-            // Do not play moves during analysis mode
-            if (typeof analysisMoves !== "undefined") return;
-
-            const move = line.split(" ")[1];
-
-            playStockfishMove(move);
-
-            if (typeof showBestMoveArrow === "function") {
-
-                const move = line.split(" ")[1];
-
-                const from = squareToIndex(move.substring(0, 2));
-                const to = squareToIndex(move.substring(2, 4));
-
-                showBestMoveArrow(from, to);
+// Initialise Stockfish web worker for moves generation
+function getStockfishWorker() {
+    if (!stockfishWorker) {
+        stockfishWorker = new Worker("js/stockfish.js");
+        stockfishWorker.postMessage("uci");
+        stockfishWorker.postMessage("isready");
+        
+        stockfishWorker.onmessage = function(e) {
+            const line = e.data;
+            // console.log("Bot Engine Output:", line);
+            
+            if (line.startsWith("bestmove")) {
+                const parts = line.split(" ");
+                const bestmove = parts[1];
+                if (bestMoveCallback && bestmove && bestmove !== "(none)") {
+                    const callback = bestMoveCallback;
+                    bestMoveCallback = null;
+                    callback(bestmove);
+                }
             }
-        }
-
-        // ======================
-        // STOCKFISH EVALUATION
-        // ======================
-        if (line.includes("score cp")) {
-
-            const score = parseInt(line.split("score cp ")[1]);
-
-            if (!isNaN(score) && typeof updateEvaluation === "function") {
-                updateEvaluation(score / 100);
-            }
-        }
-
-        if (line.includes("score mate")) {
-
-            const mate = parseInt(line.split("score mate ")[1]);
-
-            if (!isNaN(mate)) {
-                updateEvaluation(mate > 0 ? 10 : -10);
-            }
-        }
-    };
+        };
+    }
+    return stockfishWorker;
 }
 
-function boardToFEN() {
-
-    let fen = "";
-    let empty = 0;
-
-    for (let i = 0; i < 64; i++) {
-
-        const piece = boardState[i];
-
-        if (!piece) {
-            empty++;
-        } else {
-
-            if (empty) {
-                fen += empty;
-                empty = 0;
+// Initialise a separate Stockfish worker for eval evaluations (prevents process locks)
+function getEvalWorker() {
+    if (!evalWorker) {
+        evalWorker = new Worker("js/stockfish.js");
+        evalWorker.postMessage("uci");
+        evalWorker.postMessage("isready");
+        
+        evalWorker.onmessage = function(e) {
+            const line = e.data;
+            // console.log("Eval Engine Output:", line);
+            
+            if (line.includes("score")) {
+                parseEvaluationScoreLine(line);
             }
-
-            const color = piece[0];
-            const type = piece[1];
-
-            const map = {
-                P: "p",
-                R: "r",
-                N: "n",
-                B: "b",
-                Q: "q",
-                K: "k"
-            };
-
-            let char = map[type];
-
-            if (color === "w")
-                char = char.toUpperCase();
-
-            fen += char;
-        }
-
-        if ((i + 1) % 8 === 0) {
-
-            if (empty) {
-                fen += empty;
-                empty = 0;
-            }
-
-            if (i !== 63) fen += "/";
-        }
+        };
     }
-
-    // turn
-    const turn = gameState.currentTurn === "white" ? "w" : "b";
-
-    // castling rights
-    let castling = "";
-
-    if (!movedPieces.wK && !movedPieces.wR7) castling += "K";
-    if (!movedPieces.wK && !movedPieces.wR0) castling += "Q";
-    if (!movedPieces.bK && !movedPieces.bR7) castling += "k";
-    if (!movedPieces.bK && !movedPieces.bR0) castling += "q";
-
-    if (castling === "") castling = "-";
-
-    // en passant
-    let ep = "-";
-    if (enPassantTarget !== null) {
-        ep = indexToSquare(enPassantTarget);
-    }
-
-    return `${fen} ${turn} ${castling} ${ep} 0 1`;
+    return evalWorker;
 }
 
-function requestStockfishMove() {
+// Terminate workers on exit
+window.terminateStockfishWorker = function() {
+    if (stockfishWorker) {
+        stockfishWorker.terminate();
+        stockfishWorker = null;
+    }
+    if (evalWorker) {
+        evalWorker.terminate();
+        evalWorker = null;
+    }
+    bestMoveCallback = null;
+    evalCallback = null;
+};
 
-    initStockfish();
+// ==========================================
+// EVALUATION PARSER & UI fill bar
+// ==========================================
 
-    if (!selectedBot) return; // safety check
+function parseEvaluationScoreLine(line) {
+    // line format: "info depth 8 seldepth 8 score cp 24 nodes..." or "score mate -2"
+    const parts = line.split(" ");
+    const scoreIdx = parts.indexOf("score");
+    if (scoreIdx === -1) return;
+    
+    const type = parts[scoreIdx + 1]; // "cp" or "mate"
+    const value = parseInt(parts[scoreIdx + 2]);
+    
+    if (isNaN(value)) return;
+    
+    let evaluationScore = 0.0;
+    let displayScore = "0.0";
+    let isWhiteAdvantage = true;
+    
+    // Check active side from turn
+    const activeColor = gameState.currentTurn;
+    const isWhiteActive = activeColor === "white";
+    
+    if (type === "cp") {
+        // Centipawns to score converter (100 cp = 1.0 pawn score)
+        let cp = value;
+        // Stockfish scores are from the perspective of the side moving
+        if (!isWhiteActive) {
+            cp = -cp;
+        }
+        
+        evaluationScore = cp / 100;
+        displayScore = evaluationScore > 0 ? `+${evaluationScore.toFixed(1)}` : evaluationScore.toFixed(1);
+    } else if (type === "mate") {
+        let mate = value;
+        if (!isWhiteActive) {
+            mate = -mate;
+        }
+        evaluationScore = mate > 0 ? 10.0 : -10.0; // Max out height for mate
+        displayScore = mate > 0 ? `+M${Math.abs(mate)}` : `-M${Math.abs(mate)}`;
+    }
+    
+    // Call analysis handlers if active
+    if (evalCallback) {
+        evalCallback(evaluationScore, displayScore);
+        return;
+    }
+    
+    // Update Active Game UI Eval fill bar
+    updateEvalBarGraphics("evalFill", "evalScore", evaluationScore, displayScore);
+}
 
+function updateEvalBarGraphics(fillId, scoreId, score, displayStr) {
+    const fill = document.getElementById(fillId);
+    const text = document.getElementById(scoreId);
+    if (!text) return;
+    
+    text.innerText = displayStr;
+    
+    if (!fill) return;
+    
+    // Map score -5.0 to +5.0 into height percentages 10% to 90%
+    let percentage = 50 + (score * 8);
+    percentage = Math.max(10, Math.min(90, percentage));
+    
+    // Invert because the fill element represents WHITE's advantage from the bottom
+    fill.style.height = `${percentage}%`;
+}
+
+// Request Stockfish analysis evaluation
+window.requestStockfishEvaluation = function(fen, callback = null) {
+    const worker = getEvalWorker();
+    evalCallback = callback;
+    
+    worker.postMessage("stop");
+    worker.postMessage(`position fen ${fen}`);
+    worker.postMessage("go depth 10"); // fast calculation depth
+};
+
+// ==========================================
+// BOT MOVES GENERATION
+// ==========================================
+
+// Triggered by turn-switching, requests bot moves
+window.triggerBotMoveTask = function() {
+    if (!selectedBot || gameMode !== "bot" || gameState.currentTurn !== "black") return;
+    
     const fen = boardToFEN();
-    // const thinkTime = selectedBot.thinking || 600;
-    const thinkTime = Math.max(selectedBot.thinking || 600, 400);
-    const elo = selectedBot.elo || 1200;
+    const elo = selectedBot.elo;
+    const thinkTime = selectedBot.thinking;
+    
+    const botSpeech = document.getElementById("botSpeech");
+    if (botSpeech) {
+        // Randomise dialogue triggers
+        const dialogueList = BOT_DIALOGUES[selectedBot.id] || ["Let's see...", "A logical step.", "My turn!"];
+        botSpeech.innerText = dialogueList[Math.floor(Math.random() * dialogueList.length)];
+        botSpeech.style.opacity = 1;
+    }
+    
+    requestBotMove(fen, elo, thinkTime, (bestmove) => {
+        // Parse move indices e.g. "e2e4" -> fromIdx, toIdx
+        const fromSquare = bestmove.substring(0, 2);
+        const toSquare = bestmove.substring(2, 4);
+        
+        const fromIdx = algebraicSquareToIndex(fromSquare);
+        const toIdx = algebraicSquareToIndex(toSquare);
+        
+        // Execute move on the active board
+        setTimeout(() => {
+            executePawnPieceMove(fromIdx, toIdx);
+            
+            // Fade speech bubs slightly after moving
+            setTimeout(() => {
+                if (botSpeech) botSpeech.style.opacity = 0.85;
+            }, 600);
+        }, 150);
+    });
+};
 
-    // send board position
-    stockfish.postMessage("position fen " + fen);
-
-    // limit engine strength
-    stockfish.postMessage("setoption name UCI_LimitStrength value true");
-    stockfish.postMessage("setoption name UCI_Elo value " + elo);
-
-    // start calculation
-    stockfish.postMessage("go movetime " + thinkTime);
+function requestBotMove(fen, elo, thinkTime, callback) {
+    const worker = getStockfishWorker();
+    bestMoveCallback = callback;
+    
+    worker.postMessage("stop");
+    worker.postMessage(`position fen ${fen}`);
+    
+    // Configure ELO and skill caps to scale bot difficulty
+    worker.postMessage("setoption name UCI_LimitStrength value true");
+    worker.postMessage(`setoption name UCI_Elo value ${elo}`);
+    
+    worker.postMessage(`go movetime ${thinkTime}`);
 }
 
-function getBotSkill() {
-
-    if (!selectedBot) return 5; // default skill
-
-    const skillMap = {
-        levy: 2,
-        anna: 5,
-        eric: 8,
-        hikaru: 12,
-        fabi: 15,
-        ding: 16,
-        anand: 17,
-        kasparov: 18,
-        magnus: 20
-    };
-
-    return skillMap[selectedBot.id] || 10;
-}
-
-function squareToIndex(square) {
-
-    const file = square.charCodeAt(0) - 97;
-    const rank = 8 - parseInt(square[1]);
-
+function algebraicSquareToIndex(squareStr) {
+    const file = squareStr.charCodeAt(0) - 97; // "a" is 97
+    const rank = 8 - parseInt(squareStr[1]);
     return rank * 8 + file;
 }
 
-function playStockfishMove(move) {
-
-    const from = squareToIndex(move.substring(0, 2));
-    const to = squareToIndex(move.substring(2, 4));
-
-    makeMove(from, to);
-}
+// Expose evaluation UI updates globally
+window.updateEvalBarGraphics = updateEvalBarGraphics;
